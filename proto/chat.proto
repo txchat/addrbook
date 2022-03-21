@@ -1,0 +1,180 @@
+syntax = "proto3";
+
+import "transaction.proto";
+
+package types;
+
+//Sign 签名
+message Sign {
+    string publicKey = 1; //公钥
+    string signature = 2; //数字签名
+}
+
+message Friend {
+    string mainAddress = 1;
+    string friendAddress = 2;
+    int64 createTime = 3;
+    repeated string groups = 4;
+}
+
+message Black {
+    string mainAddress = 1;
+    string targetAddress = 2;
+    int64 createTime = 3;
+}
+
+message ChatAction {
+    oneof value {
+        UpdateFriends update = 1;
+        UpdateBlackList black = 2;
+        UpdateFields updateUser = 3;
+        UpdateServerGroups updateServerGroup = 4;
+    }
+    int32 ty = 10;
+}
+
+//查询好友列表
+message ReqGetFriends {
+    string mainAddress = 1;
+    int32 count      = 2;
+    string index = 3;
+    int64 time = 4;
+    Sign sign = 5;
+}
+
+message ReplyGetFriends {
+    repeated Friend friends = 1;
+}
+
+//更新好友列表
+message ReqUpdateFriend {
+    string friendAddress = 1;
+    int32 type = 2;
+    repeated string groups = 3;
+}
+
+message UpdateFriends{
+    repeated ReqUpdateFriend friends = 1;
+}
+
+//查询黑名单列表
+message ReqGetBlackList {
+    string mainAddress = 1;
+    int32 count      = 2;
+    string index = 3;
+    int64 time = 4;
+    Sign sign = 5;
+}
+
+message ReplyGetBlackList {
+    repeated Black list = 1;
+}
+
+//更新黑名单请求
+message ReqUpdateBlackList {
+    string targetAddress = 1;
+    int32 type = 2;
+}
+
+message UpdateBlackList{
+    repeated ReqUpdateBlackList list = 1;
+}
+
+//------------------------user info----------------//
+message Field {
+    string mainAddress = 1;
+    string name = 2;
+    string value = 3;
+    string level = 4;
+}
+
+//查询用户信息
+message ReqGetUser {
+    string mainAddress = 1;
+    string targetAddress = 2;
+    int32 count      = 3;
+    string index = 4;
+    int64 time = 5;
+    Sign sign = 6;
+}
+
+message ReplyGetField {
+    string name = 1;
+    string value = 2;
+    string level = 3;
+}
+
+message ReplyGetUser {
+    repeated ReplyServerInfo chatServers = 1;
+    repeated ReplyGetField fields = 2;
+    repeated string groups = 3;
+}
+
+//更新好友列表
+message ReqUpdateField {
+    string name = 1;
+    string value = 2;
+    int32  type = 3;
+    string level = 4;
+}
+
+message UpdateFields{
+    repeated ReqUpdateField fields = 1;
+}
+
+//--------------------------server groups-------------------------//
+message ServerGroup {
+    string id = 1;
+    string name = 2;
+    string value = 3;
+    string mainAddress = 4;
+}
+
+message UpdateServerGroups{
+    repeated ReqUpdateServerGroup groups = 1;
+}
+//server groups request
+//查询分组信息
+message ReqGetServerGroup {
+    string mainAddress = 1;
+    int32 count      = 2;
+    string index = 3;
+    int64 time = 4;
+    Sign sign = 5;
+}
+
+message ReqUpdateServerGroup {
+    string id = 1;
+    string name = 2;
+    string value = 3;
+    int32  type = 4;
+}
+
+message ReplyServerInfo {
+    string id = 1;
+    string name = 2;
+    string address = 3;
+}
+
+//server groups reply
+message ReplyGetServerGroup {
+    string id = 1;
+    string name = 2;
+    string value = 3;
+}
+
+message ReplyGetServerGroups {
+    repeated ReplyGetServerGroup groups = 1;
+}
+
+service chat {
+    rpc Update(UpdateFriends) returns (UnsignTx) {}
+    rpc Black(UpdateBlackList) returns (UnsignTx) {}
+    rpc UpdateUser(UpdateFields) returns (UnsignTx) {}
+    rpc UpdateServerGroup(UpdateServerGroups) returns (UnsignTx) {}
+
+    rpc GetFriends(ReqGetFriends) returns (ReplyGetFriends) {}
+    rpc GetBlackList(ReqGetBlackList) returns (ReplyGetBlackList) {}
+    rpc GetUser(ReqGetUser) returns (ReplyGetUser) {}
+    rpc GetServerGroup(ReqGetServerGroup) returns (ReplyGetServerGroups) {}
+}
