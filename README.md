@@ -23,19 +23,21 @@
 
 请求参数
 
-|**参数**　|**名字**|**类型**|**约束**|**说明**|
-|:--:|:--:|:--:|:--:|:--:|
-|method|方法|string|必填|chain33框架上的方法, Query 是查询操作 |
-|execer|执行器|string|必填| |
-|funcName|方法|string|必填| |
-|mainAddress|自己的地址|string|必填| |
-|count|查询数量|int|必填| |
-|index|索引开始地址|string|必填|空为从头查询 |
-|time|时间|int64|必填|当前时间戳,单位 毫秒 |
-|sign|签名信息|object|必填|详情如下 |
-|publicKey|公钥|string|必填|hex字符串表示 |
-|signature|签名|string|必填|hex字符串表示 |
-```
+| **参数**      | **名字** | **类型** | **约束** | **说明**                     |
+|:-----------:|:------:|:------:|:------:|:--------------------------:|
+| method      | 方法     | string | 必填     | chain33框架上的方法, Query 是查询操作 |
+| execer      | 执行器    | string | 必填     |                            |
+| funcName    | 方法     | string | 必填     |                            |
+| mainAddress | 自己的地址  | string | 必填     |                            |
+| count       | 查询数量   | int    | 必填     |                            |
+| index       | 索引开始地址 | string | 必填     | 空为从头查询                     |
+| time        | 时间     | int64  | 必填     | 当前时间戳,单位 毫秒                |
+| addrType    | 地址类型   | int32  | 必填     | 参考:[chain33地址](###地址类型)    |
+| sign        | 签名信息   | object | 必填     | 详情如下                       |
+| publicKey   | 公钥     | string | 必填     | hex字符串表示                   |
+| signature   | 签名     | string | 必填     | hex字符串表示                   |
+
+```json
 {
 	"jsonrpc": "2.0",
 	"id": 1,
@@ -48,6 +50,7 @@
 			"count":20,
 			"index":"",
 			"time": 1581587512000,
+			"addrType": -1,
 			"sign": {
 				"publicKey" : "026372967a9885e1248c4d06407582d3808dde75b931f2186e68246698aa92dfaa",
 				"signature" : "93cb8bca06e73f8f2702eceb5cdee419edc47eb45a5c23d20f4bb3bcd28b215c70f3099d035b566c3046d036da2ef3b2f7cc9fbe053b00cae859f5509efb4d2e00"
@@ -59,13 +62,14 @@
 
 返回参数
 
-|**参数**|**名字**|**类型**|**说明**|
-|:--:|:--:|:--:|:--:|
-|mainAddress|地址|string|自己的地址 |
-|friendAddress|地址|string|好友地址 |
-|createTime|创建时间|int|单位：毫秒|
-|groups|好友分组|string[]|分组id|
-```
+| **参数**        | **名字** | **类型**   | **说明** |
+|:-------------:|:------:|:--------:|:------:|
+| mainAddress   | 地址     | string   | 自己的地址  |
+| friendAddress | 地址     | string   | 好友地址   |
+| createTime    | 创建时间   | int      | 单位：毫秒  |
+| groups        | 好友分组   | string[] | 分组id   |
+
+```json
 {
 	"id": 1,
 	"result": {
@@ -84,12 +88,12 @@
 
 请求参数　
 
-|**参数**　|**名字**|**类型**|约束|**说明**|
-|:--:|:--:|:--:|:--:|:--:|
-|friends|好友地址|object[]|true |详情如下 |
-|friendAddress|地址|string|true |好友地址 |
-|type|更新类型|int|true|1:添加2:删除|
-|groups|好友分组|string[]|true|分组id|
+| **参数**        | **名字** | **类型**   | 约束   | **说明**   |
+|:-------------:|:------:|:--------:|:----:|:--------:|
+| friends       | 好友地址   | object[] | true | 详情如下     |
+| friendAddress | 地址     | string   | true | 好友地址     |
+| type          | 更新类型   | int      | true | 1:添加2:删除 |
+| groups        | 好友分组   | string[] | true | 分组id     |
 
 ```json
 {
@@ -111,12 +115,13 @@
 
 返回参数
 
-|**参数**|**名字**|**类型**|**说明**|
-|:--:|:--:|:--:|:--:|
-|id|地址|object||
-|result|结果hash|string| |
-|error|错误|object||
-```
+| **参数** | **名字** | **类型** | **说明** |
+|:------:|:------:|:------:|:------:|
+| id     | 地址     | object |        |
+| result | 结果hash | string |        |
+| error  | 错误     | object |        |
+
+```json
 {
     "id": 1,
     "result": "0a0463686174123050640a2c0a0210010a260a2231436245565439526e4d356f5a68574d6a34667855724a5839345674526f747a7673100120a08d0630b1b78ddaeda3dbbf653a22313241485774504e68785a4b5152515443504b61334a596e5a374b59356e4776326b",
@@ -129,19 +134,21 @@
 
 请求参数　　
 
-|**参数**　|**名字**|**类型**|**约束**|**说明**|
-|:--:|:--:|:--:|:--:|:--:|
-|method|方法|string|必填|chain33框架上的方法, Query 是查询操作 |
-|execer|执行器|string|必填| |
-|funcName|方法|string|必填| |
-|mainAddress|自己的地址|string|必填| |
-|count|查询数量|int|必填| |
-|index|索引开始地址|string|必填|空为从头查询 |
-|time|时间|int64|必填|当前时间戳,单位 毫秒 |
-|sign|签名信息|object|必填|详情如下 |
-|publicKey|公钥|string|必填|hex字符串表示 |
-|signature|签名|string|必填|hex字符串表示 |
-```
+| **参数**      | **名字** | **类型** | **约束** | **说明**                     |
+|:-----------:|:------:|:------:|:------:|:--------------------------:|
+| method      | 方法     | string | 必填     | chain33框架上的方法, Query 是查询操作 |
+| execer      | 执行器    | string | 必填     |                            |
+| funcName    | 方法     | string | 必填     |                            |
+| mainAddress | 自己的地址  | string | 必填     |                            |
+| count       | 查询数量   | int    | 必填     |                            |
+| index       | 索引开始地址 | string | 必填     | 空为从头查询                     |
+| time        | 时间     | int64  | 必填     | 当前时间戳,单位 毫秒                |
+| addrType    | 地址类型   | int32  | 必填     | 参考:[chain33地址](###地址类型)    |
+| sign        | 签名信息   | object | 必填     | 详情如下                       |
+| publicKey   | 公钥     | string | 必填     | hex字符串表示                   |
+| signature   | 签名     | string | 必填     | hex字符串表示                   |
+
+```json
 {
 	"jsonrpc": "2.0",
 	"id": 1,
@@ -154,6 +161,7 @@
 			"count":20,
 			"index":"",
 			"time": 1581587512000,
+			"addrType": -1,
 			"sign": {
 				"publicKey" : "026372967a9885e1248c4d06407582d3808dde75b931f2186e68246698aa92dfaa",
 				"signature" : "93cb8bca06e73f8f2702eceb5cdee419edc47eb45a5c23d20f4bb3bcd28b215c70f3099d035b566c3046d036da2ef3b2f7cc9fbe053b00cae859f5509efb4d2e00"
@@ -165,12 +173,13 @@
 
 返回参数
 
-|**参数**|**名字**|**类型**|**说明**|
-|:--:|:--:|:--:|:--:|
-|mainAddress|地址|string|自己的地址 |
-|targetAddress|地址|string|黑名单用户地址 |
-|createTime|创建时间|int|单位：毫秒|
-```
+| **参数**        | **名字** | **类型** | **说明**  |
+|:-------------:|:------:|:------:|:-------:|
+| mainAddress   | 地址     | string | 自己的地址   |
+| targetAddress | 地址     | string | 黑名单用户地址 |
+| createTime    | 创建时间   | int    | 单位：毫秒   |
+
+```json
 {
 	"id": 1,
 	"result": {
@@ -186,13 +195,13 @@
 ### UpdateBlackList(更新黑名单列表)
 [返回概览](#去中心化聊天合约)
 
-请求参数　
+请求参数
 
-|**参数**　|**名字**|**类型**|**约束**|**说明**|
-|:--:|:--:|:--:|:--:|:--:|
-|list|黑民单列表|object[]|详情如下 ||
-|targetAddress|地址|string|好友地址 ||
-|type|更新类型|int|1:添加2:删除||
+| **参数**        | **名字** | **类型**   | **约束**   | **说明** |
+|:-------------:|:------:|:--------:|:--------:|:------:|
+| list          | 黑民单列表  | object[] | 详情如下     |        |
+| targetAddress | 地址     | string   | 好友地址     |        |
+| type          | 更新类型   | int      | 1:添加2:删除 |        |
 
 ```json
 {
@@ -212,12 +221,13 @@
 
 返回参数
 
-|**参数**|**名字**|**类型**|**说明**|
-|:--:|:--:|:--:|:--:|
-|id|地址|object||
-|result|结果hash|string| |
-|error|错误|object||
-```
+| **参数** | **名字** | **类型** | **说明** |
+|:------:|:------:|:------:|:------:|
+| id     | 地址     | object |        |
+| result | 结果hash | string |        |
+| error  | 错误     | object |        |
+
+```json
 {
     "id": 1,
     "result": "0a0463686174123050640a2c0a0210010a260a2231436245565439526e4d356f5a68574d6a34667855724a5839345674526f747a7673100120a08d0630b1b78ddaeda3dbbf653a22313241485774504e68785a4b5152515443504b61334a596e5a374b59356e4776326b",
@@ -231,21 +241,22 @@
 
 请求参数　　
 
-|   **参数**    |   **名字**   | **类型** | **约束** |               **说明**                |
-| :-----------: | :----------: | :------: | :------: | :-----------------------------------: |
-|    method     |     方法     |  string  |   必填   | chain33框架上的方法, Query 是查询操作 |
-|    execer     |    执行器    |  string  |   必填   |                                       |
-|   funcName    |     方法     |  string  |   必填   |                                       |
-|  mainAddress  |  自己的地址  |  string  |   必填   |                                       |
-| targetAddress |   目标地址   |  string  |   必填   |                                       |
-|     count     |   查询数量   |   int    |   必填   |                                       |
-|     index     | 索引开始地址 |  string  |   必填   |             空为从头查询              |
-|     time      |     时间     |  int64   |   必填   |         当前时间戳,单位 毫秒          |
-|     sign      |   签名信息   |  object  |   必填   |               详情如下                |
-|   publicKey   |     公钥     |  string  |   必填   |             hex字符串表示             |
-|   signature   |     签名     |  string  |   必填   |             hex字符串表示             |
+| **参数**        | **名字** | **类型** | **约束** | **说明**                     |
+|:-------------:|:------:|:------:|:------:|:--------------------------:|
+| method        | 方法     | string | 必填     | chain33框架上的方法, Query 是查询操作 |
+| execer        | 执行器    | string | 必填     |                            |
+| funcName      | 方法     | string | 必填     |                            |
+| mainAddress   | 自己的地址  | string | 必填     |                            |
+| targetAddress | 目标地址   | string | 必填     |                            |
+| count         | 查询数量   | int    | 必填     |                            |
+| index         | 索引开始地址 | string | 必填     | 空为从头查询                     |
+| time          | 时间     | int64  | 必填     | 当前时间戳,单位 毫秒                |
+| addrType      | 地址类型   | int32  | 必填     | 参考:[chain33地址](###地址类型)    |
+| sign          | 签名信息   | object | 必填     | 详情如下                       |
+| publicKey     | 公钥     | string | 必填     | hex字符串表示                   |
+| signature     | 签名     | string | 必填     | hex字符串表示                   |
 
-```
+```json
 {
 	"jsonrpc": "2.0",
 	"id": 1,
@@ -259,6 +270,7 @@
 			"count":20,
 			"index":"",
 			"time": 1581587512000,
+			"addrType": -1,
 			"sign": {
 				"publicKey" : "026372967a9885e1248c4d06407582d3808dde75b931f2186e68246698aa92dfaa",
 				"signature" : "93cb8bca06e73f8f2702eceb5cdee419edc47eb45a5c23d20f4bb3bcd28b215c70f3099d035b566c3046d036da2ef3b2f7cc9fbe053b00cae859f5509efb4d2e00"
@@ -270,19 +282,19 @@
 
 返回参数
 
-| **参数** | **名字** | **类型** | **约束** |            **说明**            |
-| :------: | :------: | :------: | :------: | :----------------------------: |
-|  groups  | 分组列表 | string[] |   true   |     如果查询的是好友，返回好友分组列表    |
-|  chatServers  | 服务列表 | object[] |   true   |            详情如下            |
-|  id   | 编号 |  string  |   true   |  |
-|   name   |   名称   |  string  |   true   |                                |
-|  address   |    地址    |  string  |   true   |                                |
-|  fields  | 字段列表 | object[] |   true   |            详情如下            |
-|   name   |   名称   |  string  |   true   |                                |
-|  value   |    值    |  string  |   true   |                                |
-|  level   | 安全级别 |  string  |   true   | [private]、[protect]、[public] |
+| **参数**      | **名字** | **类型**   | **约束** | **说明**                       |
+|:-----------:|:------:|:--------:|:------:|:----------------------------:|
+| groups      | 分组列表   | string[] | true   | 如果查询的是好友，返回好友分组列表            |
+| chatServers | 服务列表   | object[] | true   | 详情如下                         |
+| id          | 编号     | string   | true   |                              |
+| name        | 名称     | string   | true   |                              |
+| address     | 地址     | string   | true   |                              |
+| fields      | 字段列表   | object[] | true   | 详情如下                         |
+| name        | 名称     | string   | true   |                              |
+| value       | 值      | string   | true   |                              |
+| level       | 安全级别   | string   | true   | [private]、[protect]、[public] |
 
-```
+```json
 {
 	"id": 1,
 	"result": {
@@ -317,20 +329,21 @@
 
 请求参数　　
 
-|  **参数**   |   **名字**   | **类型** | **约束** |               **说明**                |
-| :---------: | :----------: | :------: | :------: | :-----------------------------------: |
-|   method    |     方法     |  string  |   必填   | chain33框架上的方法, Query 是查询操作 |
-|   execer    |    执行器    |  string  |   必填   |                                       |
-|  funcName   |     方法     |  string  |   必填   |                                       |
-| mainAddress |  自己的地址  |  string  |   必填   |                                       |
-|    count    |   查询数量   |   int    |   必填   |                                       |
-|    index    | 索引开始地址 |  string  |   必填   |             空为从头查询              |
-|    time     |     时间     |  int64   |   必填   |         当前时间戳,单位 毫秒          |
-|    sign     |   签名信息   |  object  |   必填   |               详情如下                |
-|  publicKey  |     公钥     |  string  |   必填   |             hex字符串表示             |
-|  signature  |     签名     |  string  |   必填   |             hex字符串表示             |
+| **参数**      | **名字** | **类型** | **约束** | **说明**                     |
+|:-----------:|:------:|:------:|:------:|:--------------------------:|
+| method      | 方法     | string | 必填     | chain33框架上的方法, Query 是查询操作 |
+| execer      | 执行器    | string | 必填     |                            |
+| funcName    | 方法     | string | 必填     |                            |
+| mainAddress | 自己的地址  | string | 必填     |                            |
+| count       | 查询数量   | int    | 必填     |                            |
+| index       | 索引开始地址 | string | 必填     | 空为从头查询                     |
+| time        | 时间     | int64  | 必填     | 当前时间戳,单位 毫秒                |
+| addrType    | 地址类型   | int32  | 必填     | 参考:[chain33地址](###地址类型)    |
+| sign        | 签名信息   | object | 必填     | 详情如下                       |
+| publicKey   | 公钥     | string | 必填     | hex字符串表示                   |
+| signature   | 签名     | string | 必填     | hex字符串表示                   |
 
-```
+```json
 {
 	"jsonrpc": "2.0",
 	"id": 1,
@@ -343,6 +356,7 @@
 			"count":20,
 			"index":"",
 			"time": 1581587512000,
+			"addrType": -1,
 			"sign": {
 				"publicKey" : "026372967a9885e1248c4d06407582d3808dde75b931f2186e68246698aa92dfaa",
 				"signature" : "93cb8bca06e73f8f2702eceb5cdee419edc47eb45a5c23d20f4bb3bcd28b215c70f3099d035b566c3046d036da2ef3b2f7cc9fbe053b00cae859f5509efb4d2e00"
@@ -361,7 +375,7 @@
 |   name   |   名称   |  string  |   true   |          |
 |  value   |    值    |  string  |   true   |          |
 
-```
+```json
 {
 	"id": 1,
 	"result": {
@@ -420,7 +434,7 @@
 |  result  | 结果hash |  string  |          |
 |  error   |   错误   |  object  |          |
 
-```
+```json
 {
     "id": 1,
     "result": "0a0463686174123050640a2c0a0210010a260a2231436245565439526e4d356f5a68574d6a34667855724a5839345674526f747a7673100120a08d0630b1b78ddaeda3dbbf653a22313241485774504e68785a4b5152515443504b61334a596e5a374b59356e4776326b",
@@ -482,7 +496,7 @@
 |  result  | 结果hash |  string  |          |
 |  error   |   错误   |  object  |          |
 
-```
+```json
 {
     "id": 1,
     "result": "0a0463686174123050640a2c0a0210010a260a2231436245565439526e4d356f5a68574d6a34667855724a5839345674526f747a7673100120a08d0630b1b78ddaeda3dbbf653a22313241485774504e68785a4b5152515443504b61334a596e5a374b59356e4776326b",
@@ -499,3 +513,11 @@
 3. 将第二步的结果进行sha256
 4. 使用secp256k1加密第三步的结果
 5. 将第四步hex编码成十六进制字符串填入结果中
+
+### 地址类型
+公钥到地址的转换
+https://github.com/33cn/chain33/blob/master/common/address/README.md
+
+https://github.com/33cn/chain33/blob/master/types/sign.md
+
+https://github.com/33cn/chain33/blob/master/common/crypto/README.md

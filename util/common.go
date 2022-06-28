@@ -81,7 +81,7 @@ func summaryNoEncode(i interface{}) ([]byte, error) {
 }
 
 func Secp256k1VerifyChain33(msg, sig, pubKey []byte) (b bool) {
-	c, err := crypto.New(types.GetSignName("", types.SECP256K1))
+	c, err := crypto.Load(types.GetSignName("", types.SECP256K1), -1)
 	if err != nil {
 		return false
 	}

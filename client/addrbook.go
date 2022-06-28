@@ -17,7 +17,7 @@ var (
 )
 
 func init() {
-	cr, err := crypto.New(types.GetSignName("", signType))
+	cr, err := crypto.Load(types.GetSignName("", signType), -1)
 	if err != nil {
 		panic(err)
 	}
