@@ -12,15 +12,28 @@ APP_NAME := chain33
 PKG_NAME := ${APP_NAME}_v${VERSION}
 PKG := ${PKG_NAME}.tar.gz
 
+HOSTARCH=$(shell uname -m)
+HOSTOS=$(shell uname -s | tr '[:upper:]' '[:lower:]')
+GOBASE=GO111MODULE=on GOPROXY=https://goproxy.cn,direct GOSUMDB="sum.golang.google.cn"
+GOENV=GOOS=$(HOSTOS) GOARCH=$(HOSTARCH) ${GOBASE}
+
+
 .PHONY: build build-arm64 clean
 
-build:
-	GOOS=linux GOARCH=amd64 GO111MODULE=on GOPROXY=https://goproxy.cn,direct GOSUMDB="sum.golang.google.cn" GOPRIVATE=gitlab.33.cn go build $(BUILD_FLAGS) -v -i -o $(APP) $(SRC_APP)
-	GOOS=linux GOARCH=amd64 GO111MODULE=on GOPROXY=https://goproxy.cn,direct GOSUMDB="sum.golang.google.cn" GOPRIVATE=gitlab.33.cn go build $(BUILD_FLAGS) -v -i -o $(CLI) $(SRC_CLI)
+help: ## Display this help screen
+	@printf "Help doc:\nUsage: make [command]\n"
+	@printf "[command]\n"
+	@grep -h -E '^([a-zA-Z_-]|\%)+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
-build-arm64:
-	GOOS=linux GOARCH=arm64 GO111MODULE=on GOPROXY=https://goproxy.cn,direct GOSUMDB="sum.golang.google.cn" GOPRIVATE=gitlab.33.cn go build $(BUILD_FLAGS) -v -i -o $(APP)_linux_arm64 $(SRC_APP)
-	GOOS=linux GOARCH=arm64 GO111MODULE=on GOPROXY=https://goproxy.cn,direct GOSUMDB="sum.golang.google.cn" GOPRIVATE=gitlab.33.cn go build $(BUILD_FLAGS) -v -i -o $(CLI)_linux_arm64 $(SRC_CLI)
+build:	## 编译本机系统和指令集的可执行文件
+	$(GOENV) go build $(BUILD_FLAGS) -v -i -o $(APP) $(SRC_APP)
+	$(GOENV) go build $(BUILD_FLAGS) -v -i -o $(CLI) $(SRC_CLI)
+
+build_%:  ## 编译目标机器的可执行文件（例如: make build_linux_amd64）
+	TAR_OS=$(shell echo $* | awk -F'_' '{print $$1}'); \
+	TAR_ARCH=$(shell echo $* | awk -F'_' '{print $$2}'); \
+	GOOS=$${TAR_OS} GOARCH=$${TAR_ARCH} $(GOBASE) go build $(BUILD_FLAGS) -v -i -o $(APP) $(SRC_APP);\
+	GOOS=$${TAR_OS} GOARCH=$${TAR_ARCH} $(GOBASE) go build $(BUILD_FLAGS) -v -i -o $(CLI) $(SRC_CLI)
 
 pkg: build
 	mkdir -p ${PKG_NAME}
