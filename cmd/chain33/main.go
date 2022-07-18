@@ -7,7 +7,6 @@ import (
 	_ "github.com/33cn/chain33/system"
 	_ "github.com/33cn/plugin/plugin"
 	_ "github.com/txchat/addrbook"
-	_ "gitlab.33.cn/contract/red-packet"
 
 	"github.com/33cn/chain33/util/cli"
 )
