@@ -1,21 +1,41 @@
-# 聊天
+# 去中心化聊天合约
 
-## 去中心化聊天合约
+## 开始
 
+### 从源码编译运行
+
+环境要求:
+1. Golang 1.17 or later, 参考[golang官方安装文档](https://go.dev/doc/install)
+
+```shell
+# 编译本机系统和指令集的可执行文件
+$ make build
+
+# 编译目标机器的可执行文件,例如
+$ make build_linux_amd64
 ```
-统一 jsonrpc 2.0 格式，所有请求均为 `POST` 方法，api路径统一为"/red-packet"
+编译成功后目标执行文件在工程目录的`build`文件夹下。
+
+运行服务命令：
+```shell
+$ ./build/addrbook -f ./build/addrbook.toml
 ```
 
-|接口|功能|
-|:---|:---|
-|[GetFriends](#getfriends好友列表查询)|好友列表|
-|[CreateRawUpdateFriendTx](#updatefriends更新好友列表)|更新好友|
-|[GetBlackList](#getblacklist黑名单查询)|黑名单列表|
-|[CreateRawUpdateBlackTx](#updateblacklist更新黑名单列表)|更新黑名单列表|
-|[GetUser](#getuser查询用户信息)|查询用户信息|
-|[GetServerGroup](#getservergroup查询分组信息)|查询分组信息|
-|[CreateRawUpdateUserTx](#updateuser更新用户信息)|更新用户信息|
-|[CreateRawUpdateServerGroupTx](#updateservergroup更新分组信息)|更新分组信息|
+## 接口文档
+```
+统一 jsonrpc 2.0 格式，所有请求均为 `POST` 方法"
+```
+
+| 接口                                                       | 功能      |
+|----------------------------------------------------------|---------|
+| [GetFriends](#getfriends好友列表查询)                          | 好友列表    |
+| [CreateRawUpdateFriendTx](#updatefriends更新好友列表)          | 更新好友    |
+| [GetBlackList](#getblacklist黑名单查询)                       | 黑名单列表   |
+| [CreateRawUpdateBlackTx](#updateblacklist更新黑名单列表)        | 更新黑名单列表 |
+| [GetUser](#getuser查询用户信息)                                | 查询用户信息  |
+| [GetServerGroup](#getservergroup查询分组信息)                  | 查询分组信息  |
+| [CreateRawUpdateUserTx](#updateuser更新用户信息)               | 更新用户信息  |
+| [CreateRawUpdateServerGroupTx](#updateservergroup更新分组信息) | 更新分组信息  |
 
 ---
 ### GetFriends(好友列表查询)
@@ -23,19 +43,20 @@
 
 请求参数
 
-|**参数**　|**名字**|**类型**|**约束**|**说明**|
-|:--:|:--:|:--:|:--:|:--:|
-|method|方法|string|必填|chain33框架上的方法, Query 是查询操作 |
-|execer|执行器|string|必填| |
-|funcName|方法|string|必填| |
-|mainAddress|自己的地址|string|必填| |
-|count|查询数量|int|必填| |
-|index|索引开始地址|string|必填|空为从头查询 |
-|time|时间|int64|必填|当前时间戳,单位 毫秒 |
-|sign|签名信息|object|必填|详情如下 |
-|publicKey|公钥|string|必填|hex字符串表示 |
-|signature|签名|string|必填|hex字符串表示 |
-```
+| **参数**      | **名字** | **类型** | **约束** | **说明**                     |
+|-------------|--------|--------|--------|----------------------------|
+| method      | 方法     | string | 必填     | chain33框架上的方法, Query 是查询操作 |
+| execer      | 执行器    | string | 必填     |                            |
+| funcName    | 方法     | string | 必填     |                            |
+| mainAddress | 自己的地址  | string | 必填     |                            |
+| count       | 查询数量   | int    | 必填     |                            |
+| index       | 索引开始地址 | string | 必填     | 空为从头查询                     |
+| time        | 时间     | int64  | 必填     | 当前时间戳,单位 毫秒                |
+| sign        | 签名信息   | object | 必填     | 详情如下                       |
+| publicKey   | 公钥     | string | 必填     | hex字符串表示                   |
+| signature   | 签名     | string | 必填     | hex字符串表示                   |
+
+```json
 {
 	"jsonrpc": "2.0",
 	"id": 1,
@@ -59,12 +80,13 @@
 
 返回参数
 
-|**参数**|**名字**|**类型**|**说明**|
-|:--:|:--:|:--:|:--:|
-|mainAddress|地址|string|自己的地址 |
-|friendAddress|地址|string|好友地址 |
-|createTime|创建时间|int|单位：毫秒|
-|groups|好友分组|string[]|分组id|
+| **参数**        | **名字** | **类型**   | **说明** |
+|---------------|--------|----------|--------|
+| mainAddress   | 地址     | string   | 自己的地址  |
+| friendAddress | 地址     | string   | 好友地址   |
+| createTime    | 创建时间   | int      | 单位：毫秒  |
+| groups        | 好友分组   | string[] | 分组id   |
+
 ```
 {
 	"id": 1,
@@ -84,12 +106,12 @@
 
 请求参数　
 
-|**参数**　|**名字**|**类型**|约束|**说明**|
-|:--:|:--:|:--:|:--:|:--:|
-|friends|好友地址|object[]|true |详情如下 |
-|friendAddress|地址|string|true |好友地址 |
-|type|更新类型|int|true|1:添加2:删除|
-|groups|好友分组|string[]|true|分组id|
+| **参数**        | **名字** | **类型**   | 约束   | **说明**   |
+|---------------|--------|----------|------|----------|
+| friends       | 好友地址   | object[] | true | 详情如下     |
+| friendAddress | 地址     | string   | true | 好友地址     |
+| type          | 更新类型   | int      | true | 1:添加2:删除 |
+| groups        | 好友分组   | string[] | true | 分组id     |
 
 ```json
 {
@@ -111,12 +133,13 @@
 
 返回参数
 
-|**参数**|**名字**|**类型**|**说明**|
-|:--:|:--:|:--:|:--:|
-|id|地址|object||
-|result|结果hash|string| |
-|error|错误|object||
-```
+| **参数** | **名字** | **类型** | **说明** |
+|--------|--------|--------|--------|
+| id     | 地址     | object |        |
+| result | 结果hash | string |        |
+| error  | 错误     | object |        |
+
+```json
 {
     "id": 1,
     "result": "0a0463686174123050640a2c0a0210010a260a2231436245565439526e4d356f5a68574d6a34667855724a5839345674526f747a7673100120a08d0630b1b78ddaeda3dbbf653a22313241485774504e68785a4b5152515443504b61334a596e5a374b59356e4776326b",
@@ -129,19 +152,20 @@
 
 请求参数　　
 
-|**参数**　|**名字**|**类型**|**约束**|**说明**|
-|:--:|:--:|:--:|:--:|:--:|
-|method|方法|string|必填|chain33框架上的方法, Query 是查询操作 |
-|execer|执行器|string|必填| |
-|funcName|方法|string|必填| |
-|mainAddress|自己的地址|string|必填| |
-|count|查询数量|int|必填| |
-|index|索引开始地址|string|必填|空为从头查询 |
-|time|时间|int64|必填|当前时间戳,单位 毫秒 |
-|sign|签名信息|object|必填|详情如下 |
-|publicKey|公钥|string|必填|hex字符串表示 |
-|signature|签名|string|必填|hex字符串表示 |
-```
+| **参数**      | **名字** | **类型** | **约束** | **说明**                     |
+|-------------|--------|--------|--------|----------------------------|
+| method      | 方法     | string | 必填     | chain33框架上的方法, Query 是查询操作 |
+| execer      | 执行器    | string | 必填     |                            |
+| funcName    | 方法     | string | 必填     |                            |
+| mainAddress | 自己的地址  | string | 必填     |                            |
+| count       | 查询数量   | int    | 必填     |                            |
+| index       | 索引开始地址 | string | 必填     | 空为从头查询                     |
+| time        | 时间     | int64  | 必填     | 当前时间戳,单位 毫秒                |
+| sign        | 签名信息   | object | 必填     | 详情如下                       |
+| publicKey   | 公钥     | string | 必填     | hex字符串表示                   |
+| signature   | 签名     | string | 必填     | hex字符串表示                   |
+
+```json
 {
 	"jsonrpc": "2.0",
 	"id": 1,
@@ -165,12 +189,13 @@
 
 返回参数
 
-|**参数**|**名字**|**类型**|**说明**|
-|:--:|:--:|:--:|:--:|
-|mainAddress|地址|string|自己的地址 |
-|targetAddress|地址|string|黑名单用户地址 |
-|createTime|创建时间|int|单位：毫秒|
-```
+| **参数**        | **名字** | **类型** | **说明**  |
+|---------------|--------|--------|---------|
+| mainAddress   | 地址     | string | 自己的地址   |
+| targetAddress | 地址     | string | 黑名单用户地址 |
+| createTime    | 创建时间   | int    | 单位：毫秒   |
+
+```json
 {
 	"id": 1,
 	"result": {
@@ -188,11 +213,11 @@
 
 请求参数　
 
-|**参数**　|**名字**|**类型**|**约束**|**说明**|
-|:--:|:--:|:--:|:--:|:--:|
-|list|黑民单列表|object[]|详情如下 ||
-|targetAddress|地址|string|好友地址 ||
-|type|更新类型|int|1:添加2:删除||
+| **参数**        | **名字** | **类型**   | **约束**   | **说明** |
+|---------------|--------|----------|----------|--------|
+| list          | 黑民单列表  | object[] | 详情如下     |        |
+| targetAddress | 地址     | string   | 好友地址     |        |
+| type          | 更新类型   | int      | 1:添加2:删除 |        |
 
 ```json
 {
@@ -201,10 +226,10 @@
 	"params": [{
 		"list": [{
 			"targetAddress": "1BH9k5vPypTMMHZWtx83zspF4ScBDePXGR",
-			"type": 1,
+			"type": 1
 		}, {
 			"targetAddress": "1CbEVT9RnM5oZhWMj4fxUrJX94VtRotzvs",
-			"type": 1,
+			"type": 1
 		}]
 	}]
 }
@@ -212,12 +237,13 @@
 
 返回参数
 
-|**参数**|**名字**|**类型**|**说明**|
-|:--:|:--:|:--:|:--:|
-|id|地址|object||
-|result|结果hash|string| |
-|error|错误|object||
-```
+| **参数** | **名字** | **类型** | **说明** |
+|--------|--------|--------|--------|
+| id     | 地址     | object |        |
+| result | 结果hash | string |        |
+| error  | 错误     | object |        |
+
+```json
 {
     "id": 1,
     "result": "0a0463686174123050640a2c0a0210010a260a2231436245565439526e4d356f5a68574d6a34667855724a5839345674526f747a7673100120a08d0630b1b78ddaeda3dbbf653a22313241485774504e68785a4b5152515443504b61334a596e5a374b59356e4776326b",
@@ -245,7 +271,7 @@
 |   publicKey   |     公钥     |  string  |   必填   |             hex字符串表示             |
 |   signature   |     签名     |  string  |   必填   |             hex字符串表示             |
 
-```
+```json
 {
 	"jsonrpc": "2.0",
 	"id": 1,
@@ -282,13 +308,13 @@
 |  value   |    值    |  string  |   true   |                                |
 |  level   | 安全级别 |  string  |   true   | [private]、[protect]、[public] |
 
-```
+```json
 {
 	"id": 1,
 	"result": {
         "groups":[],
 		"chatServers": [{
-            "id":"1"
+            "id":"1",
 			"name": "",
 			"address": "127.0.0.1:8088"
 		}],
@@ -330,7 +356,7 @@
 |  publicKey  |     公钥     |  string  |   必填   |             hex字符串表示             |
 |  signature  |     签名     |  string  |   必填   |             hex字符串表示             |
 
-```
+```json
 {
 	"jsonrpc": "2.0",
 	"id": 1,
@@ -361,7 +387,7 @@
 |   name   |   名称   |  string  |   true   |          |
 |  value   |    值    |  string  |   true   |          |
 
-```
+```json
 {
 	"id": 1,
 	"result": {
@@ -420,7 +446,7 @@
 |  result  | 结果hash |  string  |          |
 |  error   |   错误   |  object  |          |
 
-```
+```json
 {
     "id": 1,
     "result": "0a0463686174123050640a2c0a0210010a260a2231436245565439526e4d356f5a68574d6a34667855724a5839345674526f747a7673100120a08d0630b1b78ddaeda3dbbf653a22313241485774504e68785a4b5152515443504b61334a596e5a374b59356e4776326b",
@@ -482,7 +508,7 @@
 |  result  | 结果hash |  string  |          |
 |  error   |   错误   |  object  |          |
 
-```
+```json
 {
     "id": 1,
     "result": "0a0463686174123050640a2c0a0210010a260a2231436245565439526e4d356f5a68574d6a34667855724a5839345674526f747a7673100120a08d0630b1b78ddaeda3dbbf653a22313241485774504e68785a4b5152515443504b61334a596e5a374b59356e4776326b",
