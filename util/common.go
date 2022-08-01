@@ -113,17 +113,38 @@ func Secp256k1Verify(msg, sig, pubKey []byte) (b bool) {
 func paramsMap(i interface{}) map[string]string {
 	ret := make(map[string]string)
 
-	st := reflect.TypeOf(i)
-	v := reflect.ValueOf(i)
+	paramTypes := reflect.TypeOf(i)
+	paramValues := reflect.ValueOf(i)
 
-	ss := st.Elem()
-	vv := v.Elem()
-	for i := 0; i < ss.NumField(); i++ {
-		field := ss.Field(i)
-		val := vv.Field(i).Interface()
-		keyName := ToString(field.Tag.Get("json"))
-		keyName = strings.Replace(keyName, ",omitempty", "", 1)
-		ret[keyName] = ToString(val)
+	switch paramTypes.Kind() {
+	case reflect.Ptr:
+		paramTypes = paramTypes.Elem()
+		paramValues = paramValues.Elem()
+	}
+
+	for i := 0; i < paramTypes.NumField(); i++ {
+		field := paramTypes.Field(i)
+		if !field.IsExported() {
+			continue
+		}
+		//pick tag
+		jsonTag := field.Tag.Get("json")
+		tagOpts := strings.Split(jsonTag, ",")
+		if len(tagOpts) < 1 {
+			continue
+		}
+		jsonFieldName := strings.Trim(tagOpts[0], " ")
+		switch jsonFieldName {
+		case "", "-":
+			continue
+		}
+		//set values
+		fieldValue := paramValues.Field(i)
+		switch fieldValue.Kind() {
+		case reflect.Ptr, reflect.Array, reflect.Map, reflect.Struct:
+			continue
+		}
+		ret[jsonFieldName] = ToString(fieldValue.Interface())
 	}
 	return ret
 }

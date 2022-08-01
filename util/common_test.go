@@ -132,3 +132,14 @@ func Test_VerifyChain33Two(t *testing.T) {
 	ret := Secp256k1VerifyChain33(sum, sig, publicKey)
 	t.Log("verify", ret)
 }
+
+func Test_paramsMap(t *testing.T) {
+	in := chattypes.ReqGetFriends{
+		MainAddress: "18uQM7bvNHrLD7ZnWEWfuCpWKKiF3ERqgm",
+		Count:       40,
+		Index:       "",
+		Time:        1599104451440,
+	}
+	ret := paramsMap(&in)
+	t.Log(ret)
+}
