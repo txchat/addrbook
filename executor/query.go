@@ -3,6 +3,7 @@ package executor
 import (
 	"crypto/sha256"
 	"github.com/33cn/chain33/common/address"
+	_ "github.com/33cn/chain33/system/address"
 	"github.com/33cn/chain33/types"
 	chattypes "github.com/txchat/addrbook/types"
 	"github.com/txchat/addrbook/util"
@@ -136,7 +137,7 @@ func (r *Chat) Query_GetFriends(in *chattypes.ReqGetFriends) (types.Message, err
 			return nil, chattypes.ErrQueryTimeOut
 		}
 		//检查地址是否正确
-		if in.MainAddress != address.PubKeyToAddr(pubKey) {
+		if in.MainAddress != address.PubKeyToAddr(in.GetSign().GetAddressID(), pubKey) {
 			return nil, chattypes.ErrLackPermissions
 		}
 	case chattypes.Public:
@@ -199,7 +200,7 @@ func (r *Chat) Query_GetBlackList(in *chattypes.ReqGetBlackList) (types.Message,
 			return nil, chattypes.ErrQueryTimeOut
 		}
 		//检查地址是否正确
-		if in.MainAddress != address.PubKeyToAddr(pubKey) {
+		if in.MainAddress != address.PubKeyToAddr(in.GetSign().GetAddressID(), pubKey) {
 			return nil, chattypes.ErrLackPermissions
 		}
 	case chattypes.Public:
@@ -225,7 +226,7 @@ func (r *Chat) Query_GetBlackList(in *chattypes.ReqGetBlackList) (types.Message,
 //Query_GetUser 查询用户信息
 func (r *Chat) Query_GetUser(in *chattypes.ReqGetUser) (types.Message, error) {
 	//检查地址
-	if err := address.CheckAddress(in.TargetAddress); err != nil {
+	if err := address.CheckAddress(in.TargetAddress, -1); err != nil {
 		return nil, err
 	}
 	rpData := &chattypes.Field{
@@ -266,7 +267,7 @@ func (r *Chat) Query_GetUser(in *chattypes.ReqGetUser) (types.Message, error) {
 			return nil, chattypes.ErrQueryTimeOut
 		}
 		//检查地址是否正确
-		if in.MainAddress != address.PubKeyToAddr(pubKey) {
+		if in.MainAddress != address.PubKeyToAddr(in.GetSign().GetAddressID(), pubKey) {
 			return nil, chattypes.ErrLackPermissions
 		}
 	case chattypes.Public:
@@ -418,7 +419,7 @@ func (r *Chat) Query_GetServerGroup(in *chattypes.ReqGetServerGroup) (types.Mess
 			return nil, chattypes.ErrQueryTimeOut
 		}
 		//检查地址是否正确
-		if in.MainAddress != address.PubKeyToAddr(pubKey) {
+		if in.MainAddress != address.PubKeyToAddr(in.GetSign().GetAddressID(), pubKey) {
 			return nil, chattypes.ErrLackPermissions
 		}
 	case chattypes.Public:
