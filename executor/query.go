@@ -59,8 +59,7 @@ func (r *Chat) getServerGroups(userAddr, index string) ([]*chattypes.ServerGroup
 		MainAddress: userAddr,
 		Id:          index,
 	}
-	var indexName string
-	indexName = chattypes.TableServerGroupsIndexMainAddr
+	var indexName = chattypes.TableServerGroupsIndexMainAddr
 
 	rpRows, err := chattypes.TableList(r.GetLocalDB(), chattypes.TableServerGroupsName, indexName, rpData, chattypes.MaxServerGroupsNumb, chattypes.ListDESC)
 	if err != nil {
@@ -97,54 +96,65 @@ func (r *Chat) getFriend(userAddr, friendAddr string) (*chattypes.Friend, error)
 	return v.Data.(*chattypes.Friend), nil
 }
 
+func (r *Chat) permissionVerify(mainAddress string, tm int64, params interface{}, sign *chattypes.Sign) error {
+	//TODO 查询配置
+	queryTy := chattypes.Private
+	//TODO debug模式
+	if sign == nil {
+		queryTy = chattypes.Public
+	}
+
+	switch queryTy {
+	case chattypes.Private:
+		if sign == nil {
+			return chattypes.ErrParams
+		}
+
+		sig, err := util.HexDecode(sign.Signature)
+		if err != nil {
+			return chattypes.ErrParams
+		}
+		pubKey, err := util.HexDecode(sign.PublicKey)
+		if err != nil {
+			return chattypes.ErrParams
+		}
+
+		sum, err := util.GetSummary(params)
+		if err != nil {
+			return chattypes.ErrParams
+		}
+		msg := sha256.Sum256(sum)
+		if !util.Secp256k1Verify(msg[:], sig, pubKey) {
+			return chattypes.ErrSignErr
+		}
+		//检查时间是否过期
+		if util.CheckTimeOut(tm) {
+			return chattypes.ErrQueryTimeOut
+		}
+		//检查地址是否正确
+		if mainAddress != address.PubKeyToAddr(sign.GetAddressID(), pubKey) {
+			return chattypes.ErrLackPermissions
+		}
+	case chattypes.Public:
+	case chattypes.Protect:
+		return chattypes.ErrTypeNotExist
+	default:
+		return chattypes.ErrTypeNotExist
+	}
+	return nil
+}
+
 //Query_GetFriends 查询好友列表
 func (r *Chat) Query_GetFriends(in *chattypes.ReqGetFriends) (types.Message, error) {
 	rpData := &chattypes.Friend{
 		MainAddress:   in.MainAddress,
 		FriendAddress: in.Index,
 	}
-	var indexName string
-	indexName = chattypes.TableFriendIndexMainAddr
+	var indexName = chattypes.TableFriendIndexMainAddr
 
-	//TODO 查询配置
-	queryTy := chattypes.Private
-	//TODO debug模式
-	if in.Sign == nil {
-		queryTy = chattypes.Public
-	}
-	switch queryTy {
-	case chattypes.Private:
-		if in.Sign == nil {
-			return nil, chattypes.ErrParams
-		}
-
-		sig, err := util.HexDecode(in.Sign.Signature)
-		if err != nil {
-			return nil, chattypes.ErrParams
-		}
-		pubKey, err := util.HexDecode(in.Sign.PublicKey)
-
-		sum, err := util.GetSummary(in)
-		if err != nil {
-			return nil, chattypes.ErrParams
-		}
-		msg := sha256.Sum256(sum)
-		if !util.Secp256k1Verify(msg[:], sig, pubKey) {
-			return nil, chattypes.ErrSignErr
-		}
-		//检查时间是否过期
-		if util.CheckTimeOut(in.Time) {
-			return nil, chattypes.ErrQueryTimeOut
-		}
-		//检查地址是否正确
-		if in.MainAddress != address.PubKeyToAddr(in.GetSign().GetAddressID(), pubKey) {
-			return nil, chattypes.ErrLackPermissions
-		}
-	case chattypes.Public:
-	case chattypes.Protect:
-		return nil, chattypes.ErrTypeNotExist
-	default:
-		return nil, chattypes.ErrTypeNotExist
+	err := r.permissionVerify(in.GetMainAddress(), in.GetTime(), in, in.GetSign())
+	if err != nil {
+		return nil, err
 	}
 
 	rpRows, err := chattypes.TableList(r.GetLocalDB(), chattypes.TableFriendName, indexName, rpData, in.Count, chattypes.ListDESC)
@@ -166,48 +176,11 @@ func (r *Chat) Query_GetBlackList(in *chattypes.ReqGetBlackList) (types.Message,
 		MainAddress:   in.MainAddress,
 		TargetAddress: in.Index,
 	}
-	var indexName string
-	indexName = chattypes.TableBlackIndexMainAddr
+	var indexName = chattypes.TableBlackIndexMainAddr
 
-	//TODO 查询配置
-	queryTy := chattypes.Private
-	//TODO debug模式
-	if in.Sign == nil {
-		queryTy = chattypes.Public
-	}
-	switch queryTy {
-	case chattypes.Private:
-		if in.Sign == nil {
-			return nil, chattypes.ErrParams
-		}
-
-		sig, err := util.HexDecode(in.Sign.Signature)
-		if err != nil {
-			return nil, chattypes.ErrParams
-		}
-		pubKey, err := util.HexDecode(in.Sign.PublicKey)
-
-		sum, err := util.GetSummary(in)
-		if err != nil {
-			return nil, chattypes.ErrParams
-		}
-		msg := sha256.Sum256(sum)
-		if !util.Secp256k1Verify(msg[:], sig, pubKey) {
-			return nil, chattypes.ErrSignErr
-		}
-		//检查时间是否过期
-		if util.CheckTimeOut(in.Time) {
-			return nil, chattypes.ErrQueryTimeOut
-		}
-		//检查地址是否正确
-		if in.MainAddress != address.PubKeyToAddr(in.GetSign().GetAddressID(), pubKey) {
-			return nil, chattypes.ErrLackPermissions
-		}
-	case chattypes.Public:
-	case chattypes.Protect:
-		return nil, chattypes.ErrTypeNotExist
-	default:
-		return nil, chattypes.ErrTypeNotExist
+	err := r.permissionVerify(in.GetMainAddress(), in.GetTime(), in, in.GetSign())
+	if err != nil {
+		return nil, err
 	}
 
 	rpRows, err := chattypes.TableList(r.GetLocalDB(), chattypes.TableBlackName, indexName, rpData, in.Count, chattypes.ListDESC)
@@ -233,48 +206,11 @@ func (r *Chat) Query_GetUser(in *chattypes.ReqGetUser) (types.Message, error) {
 		MainAddress: in.TargetAddress,
 		Name:        in.Index,
 	}
-	var indexName string
-	indexName = chattypes.TableUserIndexMainAddr
+	var indexName = chattypes.TableUserIndexMainAddr
 
-	//TODO 查询配置
-	queryTy := chattypes.Private
-	//TODO debug模式
-	if in.Sign == nil {
-		queryTy = chattypes.Public
-	}
-	switch queryTy {
-	case chattypes.Private:
-		if in.Sign == nil {
-			return nil, chattypes.ErrParams
-		}
-
-		sig, err := util.HexDecode(in.Sign.Signature)
-		if err != nil {
-			return nil, chattypes.ErrParams
-		}
-		pubKey, err := util.HexDecode(in.Sign.PublicKey)
-
-		sum, err := util.GetSummary(in)
-		if err != nil {
-			return nil, chattypes.ErrParams
-		}
-		msg := sha256.Sum256(sum)
-		if !util.Secp256k1Verify(msg[:], sig, pubKey) {
-			return nil, chattypes.ErrSignErr
-		}
-		//检查时间是否过期
-		if util.CheckTimeOut(in.Time) {
-			return nil, chattypes.ErrQueryTimeOut
-		}
-		//检查地址是否正确
-		if in.MainAddress != address.PubKeyToAddr(in.GetSign().GetAddressID(), pubKey) {
-			return nil, chattypes.ErrLackPermissions
-		}
-	case chattypes.Public:
-	case chattypes.Protect:
-		return nil, chattypes.ErrTypeNotExist
-	default:
-		return nil, chattypes.ErrTypeNotExist
+	err := r.permissionVerify(in.GetMainAddress(), in.GetTime(), in, in.GetSign())
+	if err != nil {
+		return nil, err
 	}
 
 	isFriend := false
@@ -385,48 +321,11 @@ func (r *Chat) Query_GetServerGroup(in *chattypes.ReqGetServerGroup) (types.Mess
 		MainAddress: in.MainAddress,
 		Id:          in.Index,
 	}
-	var indexName string
-	indexName = chattypes.TableServerGroupsIndexMainAddr
+	var indexName = chattypes.TableServerGroupsIndexMainAddr
 
-	//TODO 查询配置
-	queryTy := chattypes.Private
-	//TODO debug模式
-	if in.Sign == nil {
-		queryTy = chattypes.Public
-	}
-	switch queryTy {
-	case chattypes.Private:
-		if in.Sign == nil {
-			return nil, chattypes.ErrParams
-		}
-
-		sig, err := util.HexDecode(in.Sign.Signature)
-		if err != nil {
-			return nil, chattypes.ErrParams
-		}
-		pubKey, err := util.HexDecode(in.Sign.PublicKey)
-
-		sum, err := util.GetSummary(in)
-		if err != nil {
-			return nil, chattypes.ErrParams
-		}
-		msg := sha256.Sum256(sum)
-		if !util.Secp256k1Verify(msg[:], sig, pubKey) {
-			return nil, chattypes.ErrSignErr
-		}
-		//检查时间是否过期
-		if util.CheckTimeOut(in.Time) {
-			return nil, chattypes.ErrQueryTimeOut
-		}
-		//检查地址是否正确
-		if in.MainAddress != address.PubKeyToAddr(in.GetSign().GetAddressID(), pubKey) {
-			return nil, chattypes.ErrLackPermissions
-		}
-	case chattypes.Public:
-	case chattypes.Protect:
-		return nil, chattypes.ErrTypeNotExist
-	default:
-		return nil, chattypes.ErrTypeNotExist
+	err := r.permissionVerify(in.GetMainAddress(), in.GetTime(), in, in.GetSign())
+	if err != nil {
+		return nil, err
 	}
 
 	rpRows, err := chattypes.TableList(r.GetLocalDB(), chattypes.TableServerGroupsName, indexName, rpData, in.Count, chattypes.ListDESC)
