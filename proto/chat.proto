@@ -9,7 +9,7 @@ option go_package = "../types";
 message Sign {
     string publicKey = 1; //公钥
     string signature = 2; //数字签名
-    int32  AddressID = 3; //签名地址类型
+    int32  addressID = 3; //签名地址类型
 }
 
 message Friend {
